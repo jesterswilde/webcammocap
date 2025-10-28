@@ -1,11 +1,23 @@
 {
   "name": "webcammocap",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "Web-based webcam motion capture explorer",
+  "dependencies": {
+    "@tensorflow-models/pose-detection": "^2.1.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.20.0",
+    "@tensorflow/tfjs-converter": "^4.20.0",
+    "@tensorflow/tfjs-core": "^4.20.0"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0"
+  }
 }

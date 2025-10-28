@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Webcam Mocap Explorer</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Webcam Mocap Explorer</h1>
+      <p class="subtitle">
+        Visualize, label, and play back body landmarks captured from your webcam.
+      </p>
+    </header>
+
+    <main>
+      <section class="capture-panel">
+        <div class="video-wrapper">
+          <video id="video" playsinline></video>
+          <canvas id="overlay"></canvas>
+          <div id="playbackNotice" class="playback-notice" hidden>
+            Playback Mode
+          </div>
+        </div>
+        <div class="controls">
+          <button id="recordToggle">Start Recording</button>
+          <button id="stopRecording" disabled>Stop</button>
+          <button id="playRecording" disabled>Play</button>
+          <button id="pausePlayback" disabled>Pause</button>
+          <button id="clearRecording" disabled>Clear</button>
+        </div>
+        <div class="playback-controls">
+          <label for="playbackSlider">Playback Timeline</label>
+          <input id="playbackSlider" type="range" min="0" max="0" value="0" disabled />
+          <div class="playback-info">
+            <span id="playbackStatus">No recording yet.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics-panel">
+        <div class="metric-card">
+          <h2>Visible Points</h2>
+          <p><span id="visibleCount">0</span> / <span id="totalCount">0</span></p>
+        </div>
+        <div class="metric-card">
+          <h2>Frame Rate</h2>
+          <p id="frameRate">0 fps</p>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <h2>Landmark Details</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Visibility</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+              </tr>
+            </thead>
+            <tbody id="landmarkTableBody">
+              <tr>
+                <td colspan="5" class="empty">No landmarks yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Built with <a href="https://github.com/tensorflow/tfjs-models/tree/master/pose-detection" target="_blank" rel="noreferrer">TensorFlow.js BlazePose</a>.
+      </p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
