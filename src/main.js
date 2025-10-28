@@ -109,22 +109,38 @@ totalCountLabel.textContent = KEYPOINT_LABELS.length.toString();
 
 const recordedFrames = [];
 let detector = null;
+let setupPromise = null;
 let isRecording = false;
 let isPlayingBack = false;
 let playbackIndex = 0;
 let playbackTimeoutId = null;
 let lastFrameTimestamp = performance.now();
 
-async function init() {
-  await tf.setBackend('webgl');
-  await tf.ready();
-  detector = await posedetection.createDetector(posedetection.SupportedModels.BlazePose, {
-    runtime: 'tfjs',
-    modelType: 'full',
-  });
+function ensureSetup() {
+  if (detector && videoElement.srcObject) {
+    return Promise.resolve();
+  }
 
-  await startCamera();
-  requestAnimationFrame(poseLoop);
+  if (!setupPromise) {
+    setupPromise = (async () => {
+      await tf.setBackend('webgl');
+      await tf.ready();
+      detector = await posedetection.createDetector(
+        posedetection.SupportedModels.BlazePose,
+        {
+          runtime: 'tfjs',
+          modelType: 'full',
+        }
+      );
+
+      await startCamera();
+    })();
+  }
+
+  return setupPromise.catch((error) => {
+    setupPromise = null;
+    throw error;
+  });
 }
 
 async function startCamera() {
@@ -141,6 +157,7 @@ async function startCamera() {
   } catch (error) {
     console.error('Unable to start camera', error);
     playbackStatus.textContent = 'Camera permission denied or unavailable.';
+    throw error;
   }
 }
 
@@ -360,14 +377,30 @@ playbackSlider.addEventListener('input', () => {
   updatePlaybackStatus();
 });
 
-function startRecording() {
-  if (isPlayingBack) {
-    pausePlayback();
+async function startRecording() {
+  if (isRecording) {
+    return;
   }
+
+  recordToggleBtn.disabled = true;
+  recordToggleBtn.textContent = 'Starting…';
+  playbackStatus.textContent = 'Starting camera…';
+
+  try {
+    if (isPlayingBack) {
+      pausePlayback();
+    }
+
+    await ensureSetup();
+  } catch (error) {
+    recordToggleBtn.disabled = false;
+    recordToggleBtn.textContent = 'Start Recording';
+    return;
+  }
+
   recordedFrames.length = 0;
   isRecording = true;
   recordToggleBtn.textContent = 'Recording…';
-  recordToggleBtn.disabled = true;
   stopRecordingBtn.disabled = false;
   clearRecordingBtn.disabled = true;
   playRecordingBtn.disabled = true;
@@ -501,4 +534,4 @@ function clearRecording() {
   playbackStatus.textContent = 'Recording cleared.';
 }
 
-init();
+requestAnimationFrame(poseLoop);
